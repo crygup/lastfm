@@ -32,7 +32,11 @@ class AsyncClient:
             await self.session.close()
 
     async def _request(
-        self, endpoint: str, params: Optional[Dict[Any, Any]] = None
+        self,
+        method: str,
+        endpoint: str,
+        params: Optional[Dict[Any, Any]] = None,
+        **kwargs,
     ) -> Dict[Any, Any]:
 
         self.session = await self._create_session()
@@ -40,7 +44,9 @@ class AsyncClient:
         params = params or {}
         params.update({"api_key": self.api_key, "format": "json", "method": endpoint})
 
-        async with self.session.get(f"{self.base_url}", params=params) as resp:
+        async with self.session.request(
+            method, f"{self.base_url}", params=params, **kwargs
+        ) as resp:
             # handle errors later
             if resp.status != 200:
                 raise Exception(f"An error occurred, status code {resp.status}")
@@ -48,7 +54,9 @@ class AsyncClient:
             return await resp.json()
 
     async def fetch_user(self, username: str) -> User:
-        data = await self._request(endpoint="user.getinfo", params={"user": username})
+        data = await self._request(
+            "GET", endpoint="user.getinfo", params={"user": username}
+        )
 
         return User(data)
 
@@ -62,16 +70,20 @@ class SyncClient:
         return self
 
     def _request(
-        self, endpoint: str, params: Optional[Dict[Any, Any]] = None
+        self,
+        method: str,
+        endpoint: str,
+        params: Optional[Dict[Any, Any]] = None,
+        **kwargs,
     ) -> Dict[Any, Any]:
 
         params = params or {}
         params.update({"api_key": self.api_key, "format": "json", "method": endpoint})
 
-        response = requests.get(self.base_url, params=params)
+        response = requests.request(method, self.base_url, params=params, **kwargs)
         return response.json()
 
     def fetch_user(self, username: str) -> User:
-        data = self._request(endpoint="user.getinfo", params={"user": username})
+        data = self._request("GET", endpoint="user.getinfo", params={"user": username})
 
         return User(data)
