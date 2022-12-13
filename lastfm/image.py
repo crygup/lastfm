@@ -30,3 +30,9 @@ class Image:
             return self._data[3]["#text"]
         except (KeyError, IndexError):
             return None
+
+    def mega(self) -> Optional[str]:
+        try:
+            return self._data[3]["#text"]
+        except (KeyError, IndexError):
+            return None
