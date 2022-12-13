@@ -18,4 +18,7 @@ class Tag:
     @property
     def count(self) -> Optional[int]:
         """This is only present with User.get_tags()"""
-        return int(self._data["count"])
+        try:
+            return int(self._data["count"])
+        except KeyError:
+            return None
