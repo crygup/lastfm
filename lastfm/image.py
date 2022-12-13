@@ -33,6 +33,13 @@ class Image:
 
     def mega(self) -> Optional[str]:
         try:
-            return self._data[3]["#text"]
+            return self._data[4]["#text"]
+        except (KeyError, IndexError):
+            return None
+
+    def extra_mega(self) -> Optional[str]:
+        """Not sure what to call this as last.fm doesn't give a proper name it's just empty and is rarely used."""
+        try:
+            return self._data[5]["#text"]
         except (KeyError, IndexError):
             return None
