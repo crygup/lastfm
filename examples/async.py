@@ -4,9 +4,9 @@ import lastfm
 
 async def main():
     async with lastfm.AsyncClient("api_key_here") as client:
-        oqt = await client.fetch_user("oqt")
+        user = await client.fetch_user("crygup")
 
-        print(oqt.playcount)
+        print(user.playcount)
 
 
 asyncio.run(main())

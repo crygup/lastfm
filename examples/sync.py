@@ -3,6 +3,6 @@ import lastfm
 
 client = lastfm.SyncClient("api_key_here")
 
-oqt = client.fetch_user("oqt")
+user = client.fetch_user("crygup")
 
-print(oqt.playcount)
+print(user.playcount)
