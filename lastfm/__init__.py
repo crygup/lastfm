@@ -1,7 +1,8 @@
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 from .album import *
 from .artist import *
+from .attr import *
 from .client import *
 from .errors import *
 from .image import *

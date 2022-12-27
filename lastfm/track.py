@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .image import Image
     from .artist import UserRecentTrackArtist
     from .album import UserRecentTrackAlbum
+    from .attr import UserRecentTrackAttr
 
 
 @dataclass(frozen=True)
@@ -30,3 +31,4 @@ class UserRecentTrack:
     album: UserRecentTrackAlbum
     now_playing: Optional[bool]
     loved: Optional[bool]
+    attr: UserRecentTrackAttr

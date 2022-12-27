@@ -13,6 +13,7 @@ from .artist import (
     SimilarArtist,
     UserRecentTrackArtist,
 )
+from .attr import UserRecentTrackAttr
 from .errors import InvalidArguments
 from .image import Image
 from .tags import AlbumTag
@@ -357,6 +358,7 @@ class AsyncClient:
         def format_data(data: Dict[Any, Any]) -> UserRecentTrack:
             artist_data: Dict[Any, Any] = data["artist"]
             album_data: Dict[Any, Any] = data["album"]
+            attr_data: Dict[Any, Any] = results["recenttracks"]["@attr"]
 
             artist = UserRecentTrackArtist(
                 musicbrainz_id=artist_data.get("mbid"),
@@ -376,6 +378,14 @@ class AsyncClient:
             except KeyError:
                 now_playing = False
 
+            attr = UserRecentTrackAttr(
+                user=attr_data["user"],
+                total_pages=int(attr_data["totalPages"]),
+                page=int(attr_data["page"]),
+                per_page=int(attr_data["perPage"]),
+                total_scrobbles=int(attr_data["total"]),
+            )
+
             return UserRecentTrack(
                 artist=artist,
                 musicbrainz_id=data.get("mbid"),
@@ -385,6 +395,7 @@ class AsyncClient:
                 album=album,
                 now_playing=now_playing,
                 loved=True if data.get("loved") == "1" else False,
+                attr=attr,
             )
 
         return [format_data(data) for data in results["recenttracks"]["track"]]
