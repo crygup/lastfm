@@ -31,3 +31,9 @@ class ArtistTopAlbum:
     url: str
     artist: MiniArtist
     images: List[Image]
+
+
+@dataclass(frozen=True)
+class UserRecentTrackAlbum:
+    musicbrainz_id: Optional[str]
+    name: str

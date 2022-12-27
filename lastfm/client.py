@@ -4,14 +4,20 @@ import aiohttp
 from dateutil.parser import parse
 
 __all__ = ["AsyncClient"]
-from .album import ArtistTopAlbum
-from .artist import Artist, ArtistSimilar, MiniArtist, SearchArtist, SimilarArtist
+from .album import Album, ArtistTopAlbum, UserRecentTrackAlbum
+from .artist import (
+    Artist,
+    ArtistSimilar,
+    MiniArtist,
+    SearchArtist,
+    SimilarArtist,
+    UserRecentTrackArtist,
+)
 from .errors import InvalidArguments
 from .image import Image
-from .track import ArtistTopTrack
-from .user import User
-from .album import Album
 from .tags import AlbumTag
+from .track import ArtistTopTrack, UserRecentTrack
+from .user import User
 from .wiki import AlbumWiki
 
 
@@ -323,3 +329,62 @@ class AsyncClient:
             listeners=int(data["listeners"]),
             wiki=wiki,
         )
+
+    async def fetch_user_recent_tracks(
+        self,
+        user: str,
+        limit: Optional[int] = None,
+        page: Optional[int] = None,
+        extended: Optional[bool] = None,
+        to: Optional[int] = None,
+    ) -> List[UserRecentTrack]:
+        """Fetches a user's recent tracks
+
+        `to` argument is in UNIX time"""
+
+        results = await self._request(
+            "GET",
+            endpoint="user.getRecentTracks",
+            params={
+                "user": user,
+                "limit": limit,
+                "page": page,
+                "extended": "1" if extended else None,
+                "to": to,
+            },
+        )
+
+        def format_data(data: Dict[Any, Any]) -> UserRecentTrack:
+            artist_data: Dict[Any, Any] = data["artist"]
+            album_data: Dict[Any, Any] = data["album"]
+
+            artist = UserRecentTrackArtist(
+                musicbrainz_id=artist_data.get("mbid"),
+                name=artist_data.get("name") if extended else artist_data.get("#test"),  # type: ignore
+                url=artist_data.get("url"),
+                images=[Image(ImageData) for ImageData in data["image"]]
+                if extended
+                else None,
+            )
+
+            album = UserRecentTrackAlbum(
+                musicbrainz_id=album_data.get("mbid"), name=album_data["#text"]
+            )
+
+            try:
+                now_playing = bool(data["@attr"]["nowplaying"])
+            except KeyError:
+                now_playing = False
+
+            return UserRecentTrack(
+                artist=artist,
+                musicbrainz_id=data.get("mbid"),
+                name=data["name"],
+                url=data["url"],
+                images=[Image(ImageData) for ImageData in data["image"]],
+                album=album,
+                now_playing=now_playing,
+                loved=True if data.get("loved") == "1" else False,
+            )
+
+        return [format_data(data) for data in results["recenttracks"]["track"]]

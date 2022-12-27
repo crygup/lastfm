@@ -64,3 +64,11 @@ class MiniArtist:
     name: str
     musicbrainz_id: Optional[str]
     url: str
+
+
+@dataclass(frozen=True)
+class UserRecentTrackArtist:
+    musicbrainz_id: Optional[str]
+    name: str
+    url: Optional[str]
+    images: Optional[List[Image]]
