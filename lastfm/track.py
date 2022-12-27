@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+import datetime
 from typing import List, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
@@ -32,3 +33,4 @@ class UserRecentTrack:
     now_playing: Optional[bool]
     loved: Optional[bool]
     attr: UserRecentTrackAttr
+    played_at: Optional[datetime.datetime]

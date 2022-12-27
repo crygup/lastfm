@@ -396,6 +396,7 @@ class AsyncClient:
                 now_playing=now_playing,
                 loved=True if data.get("loved") == "1" else False,
                 attr=attr,
+                played_at=parse(data["date"]["#text"]) if data.get("date") else None,
             )
 
         return [format_data(data) for data in results["recenttracks"]["track"]]
