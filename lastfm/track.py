@@ -3,16 +3,16 @@ from dataclasses import dataclass
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .artist import TrackArtist
+    from .artist import MiniArtist
     from .image import Image
 
 
 @dataclass(frozen=True)
-class AritstTrack:
+class ArtistTopTrack:
     name: str
     playcount: int
     listeners: int
     url: str
     streamable: str
-    artist: TrackArtist
+    artist: MiniArtist
     images: List[Image]

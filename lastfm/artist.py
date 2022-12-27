@@ -1,8 +1,10 @@
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
 
-from .image import Image
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, List, Optional
+
+if TYPE_CHECKING:
+    from .image import Image
 
 __all__ = ["Artist", "MiniArtist", "SimilarArtist", "SearchArtist"]
 
@@ -20,11 +22,11 @@ class Artist:
     listeners: int
     playcount: int
     userplaycount: Optional[int]
-    similar: List[MiniArtist]
+    similar: List[ArtistSimilar]
 
 
 @dataclass(frozen=True)
-class MiniArtist:
+class ArtistSimilar:
     """Artist from 'similar' attribute in Arist"""
 
     url: str
@@ -58,7 +60,7 @@ class SearchArtist:
 
 
 @dataclass(frozen=True)
-class TrackArtist:
+class MiniArtist:
     name: str
     musicbrainz_id: Optional[str]
     url: str

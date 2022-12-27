@@ -1,13 +1,18 @@
 from typing import Any, Dict, List, Optional
 
 import aiohttp
+from dateutil.parser import parse
 
 __all__ = ["AsyncClient"]
-from .user import User
+from .album import ArtistTopAlbum
+from .artist import Artist, ArtistSimilar, MiniArtist, SearchArtist, SimilarArtist
 from .errors import InvalidArguments
-from .artist import Artist, SimilarArtist, SearchArtist, TrackArtist, MiniArtist
-from .track import AritstTrack
 from .image import Image
+from .track import ArtistTopTrack
+from .user import User
+from .album import Album
+from .tags import AlbumTag
+from .wiki import AlbumWiki
 
 
 class AsyncClient:
@@ -90,8 +95,8 @@ class AsyncClient:
 
         userplaycount = stats.get("userplaycount")
 
-        def format_data(data: Dict[Any, Any]) -> MiniArtist:
-            return MiniArtist(
+        def format_data(data: Dict[Any, Any]) -> ArtistSimilar:
+            return ArtistSimilar(
                 url=data["url"],
                 name=data["name"],
                 images=[Image(ImageData) for ImageData in data["image"]],
@@ -179,7 +184,7 @@ class AsyncClient:
         mbid: Optional[str] = None,
         limit: Optional[int] = None,
         page: Optional[int] = None,
-    ) -> List[AritstTrack]:
+    ) -> List[ArtistTopTrack]:
         """Fetches an artist's top tracks
 
         Artist argument is not required if using mbid argument"""
@@ -195,14 +200,14 @@ class AsyncClient:
             params={"artist": artist, "limit": limit, "page": page, "mbid": mbid},
         )
 
-        def format_data(data: Dict[Any, Any]) -> AritstTrack:
-            return AritstTrack(
+        def format_data(data: Dict[Any, Any]) -> ArtistTopTrack:
+            return ArtistTopTrack(
                 name=data["name"],
                 playcount=int(data["playcount"]),
                 listeners=int(data["listeners"]),
                 url=data["url"],
                 streamable=data["streamable"],
-                artist=TrackArtist(
+                artist=MiniArtist(
                     name=data["artist"]["name"],
                     musicbrainz_id=data["artist"].get("mbid"),
                     url=data["artist"]["url"],
@@ -211,3 +216,110 @@ class AsyncClient:
             )
 
         return [format_data(data) for data in results["toptracks"]["track"]]
+
+    async def fetch_artist_top_albums(
+        self,
+        artist: Optional[str] = None,
+        mbid: Optional[str] = None,
+        limit: Optional[int] = None,
+        page: Optional[int] = None,
+    ) -> List[ArtistTopAlbum]:
+        """Fetches an artist's top albums
+
+        Artist argument is not required if using mbid argument"""
+
+        if not artist and not mbid:
+            raise InvalidArguments(
+                "You either need to provide artist OR mbid for this function."
+            )
+
+        results = await self._request(
+            "GET",
+            endpoint="artist.getTopAlbums",
+            params={"artist": artist, "limit": limit, "page": page, "mbid": mbid},
+        )
+
+        def format_data(data: Dict[Any, Any]) -> ArtistTopAlbum:
+            return ArtistTopAlbum(
+                name=data["name"],
+                playcount=data["playcount"],
+                url=data["url"],
+                artist=MiniArtist(
+                    name=data["artist"]["name"],
+                    musicbrainz_id=data["artist"].get("mbid"),
+                    url=data["url"],
+                ),
+                images=[Image(ImageData) for ImageData in data["image"]],
+            )
+
+        return [format_data(data) for data in results["topalbums"]["album"]]
+
+    async def fetch_album(
+        self,
+        artist: Optional[str] = None,
+        album: Optional[str] = None,
+        mbid: Optional[str] = None,
+        username: Optional[str] = None,
+    ) -> Album:
+        """Fetches info on an album
+
+        Artist and album arguments are not required if using mbid argument"""
+        if not mbid:
+            if not artist and not album:
+                raise InvalidArguments(
+                    "You either need to provide artist and album OR mbid for this function."
+                )
+
+            if (artist and not album) or (album and not artist):
+                raise InvalidArguments(
+                    "You need to provide artist AND album for this function"
+                )
+
+        results = await self._request(
+            "GET",
+            endpoint="album.getinfo",
+            params={
+                "artist": artist,
+                "album": album,
+                "mbid": mbid,
+                "username": username,
+            },
+        )
+
+        data: Dict[Any, Any] = results["album"]
+
+        tag_data: Optional[Dict[Any, Any]] = data.get("tags")
+        wiki_data: Optional[Dict[Any, Any]] = data.get("wiki")
+
+        tags = (
+            [AlbumTag(url=data["url"], name=data["name"]) for data in tag_data["tag"]]
+            if tag_data
+            else None
+        )
+
+        wiki: Optional[AlbumWiki] = None
+
+        if wiki_data:
+            try:
+                published = parse(wiki_data["published"])
+            except:  # blank except because last.fm api sucks and there are too many things to handle just for me to say its None
+                published = None
+
+            wiki = AlbumWiki(
+                published=published,
+                summary=wiki_data.get("summar"),
+                content=wiki_data.get("content"),
+            )
+
+        return Album(
+            artist=data["artist"],
+            musicbrainz_id=data.get("mbid"),
+            tags=tags,
+            playcount=int(data["playcount"]),
+            images=[Image(ImageData) for ImageData in data["image"]],
+            url=data["url"],
+            name=data["name"],
+            userplaycount=data.get("userplaycount"),
+            listeners=int(data["listeners"]),
+            wiki=wiki,
+        )
