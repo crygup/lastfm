@@ -16,7 +16,7 @@ class Artist:
     name: str
     musicbrainz_id: Optional[str]
     url: str
-    images: List[Image]
+    images: Image
     streamable: str
     ontour: str
     listeners: int
@@ -32,7 +32,7 @@ class ArtistSimilar:
     url: str
     name: str
     name: str
-    images: List[Image]
+    images: Image
 
 
 @dataclass(frozen=True)
@@ -43,7 +43,7 @@ class SimilarArtist:
     musicbrainz_id: Optional[str]
     match: str
     url: str
-    images: List[Image]
+    images: Image
     streamable: str
 
 
@@ -56,7 +56,7 @@ class SearchArtist:
     musicbrainz_id: Optional[str]
     url: str
     streamable: str
-    images: List[Image]
+    images: Image
 
 
 @dataclass(frozen=True)
@@ -71,4 +71,4 @@ class UserRecentTrackArtist:
     musicbrainz_id: Optional[str]
     name: str
     url: Optional[str]
-    images: Optional[List[Image]]
+    images: Optional[Image]

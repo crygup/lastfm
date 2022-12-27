@@ -6,7 +6,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="lastfm",
-    version="1.0.4",
+    version="1.0.5",
     description="python last.fm api wrapper",
     packages=["lastfm"],
     python_requires=">=3.8",

@@ -16,7 +16,7 @@ class Album:
     musicbrainz_id: Optional[str]
     tags: Optional[List[AlbumTag]]
     playcount: int
-    images: List[Image]
+    images: Image
     url: str
     name: str
     userplaycount: Optional[int]
@@ -30,7 +30,7 @@ class ArtistTopAlbum:
     playcount: int
     url: str
     artist: MiniArtist
-    images: List[Image]
+    images: Image
 
 
 @dataclass(frozen=True)

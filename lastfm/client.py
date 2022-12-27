@@ -106,14 +106,14 @@ class AsyncClient:
             return ArtistSimilar(
                 url=data["url"],
                 name=data["name"],
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
             )
 
         return Artist(
             name=data["name"],
             musicbrainz_id=data.get("mbid"),
             url=data["url"],
-            images=[Image(ImageData) for ImageData in data["image"]],
+            images=Image(data["image"]),
             streamable=data["streamable"],
             ontour=data["ontour"],
             listeners=int(stats["listeners"]),
@@ -151,7 +151,7 @@ class AsyncClient:
                 musicbrainz_id=data.get("mbid"),
                 match=data["match"],
                 url=data["url"],
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
                 streamable=data["streamable"],
             )
 
@@ -178,7 +178,7 @@ class AsyncClient:
                 musicbrainz_id=data.get("mbid"),
                 url=data["url"],
                 streamable=data["streamable"],
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
             )
 
         return [
@@ -219,7 +219,7 @@ class AsyncClient:
                     musicbrainz_id=data["artist"].get("mbid"),
                     url=data["artist"]["url"],
                 ),
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
             )
 
         return [format_data(data) for data in results["toptracks"]["track"]]
@@ -256,7 +256,7 @@ class AsyncClient:
                     musicbrainz_id=data["artist"].get("mbid"),
                     url=data["url"],
                 ),
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
             )
 
         return [format_data(data) for data in results["topalbums"]["album"]]
@@ -323,7 +323,7 @@ class AsyncClient:
             musicbrainz_id=data.get("mbid"),
             tags=tags,
             playcount=int(data["playcount"]),
-            images=[Image(ImageData) for ImageData in data["image"]],
+            images=Image(data["image"]),
             url=data["url"],
             name=data["name"],
             userplaycount=data.get("userplaycount"),
@@ -364,9 +364,7 @@ class AsyncClient:
                 musicbrainz_id=artist_data.get("mbid"),
                 name=artist_data.get("name") if extended else artist_data.get("#test"),  # type: ignore
                 url=artist_data.get("url"),
-                images=[Image(ImageData) for ImageData in data["image"]]
-                if extended
-                else None,
+                images=Image(data["image"]) if extended else None,
             )
 
             album = UserRecentTrackAlbum(
@@ -391,7 +389,7 @@ class AsyncClient:
                 musicbrainz_id=data.get("mbid"),
                 name=data["name"],
                 url=data["url"],
-                images=[Image(ImageData) for ImageData in data["image"]],
+                images=Image(data["image"]),
                 album=album,
                 now_playing=now_playing,
                 loved=True if data.get("loved") == "1" else False,

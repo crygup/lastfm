@@ -29,7 +29,7 @@ class Image:
             return None
 
     @property
-    def extralarge(self) -> Optional[str]:
+    def extra_large(self) -> Optional[str]:
         try:
             return self._data[3]["#text"]
         except (KeyError, IndexError):

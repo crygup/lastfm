@@ -19,7 +19,7 @@ class ArtistTopTrack:
     url: str
     streamable: str
     artist: MiniArtist
-    images: List[Image]
+    images: Image
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class UserRecentTrack:
     musicbrainz_id: Optional[str]
     name: str
     url: str
-    images: List[Image]
+    images: Image
     album: UserRecentTrackAlbum
     now_playing: Optional[bool]
     loved: Optional[bool]
